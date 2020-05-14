@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Dat19v1 ToDo Liste med API</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+<div id="myDIV" class="header">
+    <h2 style="margin:5px">ToDo List Using API</h2>
+    <input type="text" id="myInput" placeholder="Title...">
+    <span onclick="newElement()" class="addBtn">Add</span>
+</div>
+
+<ul id="myUL">
+
+</ul>
+</div>
+<script>
+
+    // Read from the API localhost:8080/todo/ and populate the list
+    $(document).ready(function () {
+
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:8080/"
+        }).done(function (data) {
+            // Add each title to UL as a LI element
+            for (var i = 0; i < data.length; i++) {
+                $('#myUL').append('<li id="' + data[i].id  + '">' + data[i].title + '<span onclick="deleteElement(' + data[i].id + ' )" class="close">X</span></li>')
+            }
+        });
+    })
+
+    function deleteElement(id) {
+        console.log(id)
+        $.ajax({
+            url: "http://localhost:8080/" + id,
+            method: "DELETE"
+        }).done(function( data ) {
+            var e = document.getElementById(id)
+            e.style.display = 'none'
+            console.log(e)
+        });
+    }
+
+    function newElement() {
+
+        var txt = $('#myInput').val()
+        //console.log(txt);
+
+        $.ajax({
+            method: "POST",
+            url: "http://localhost:8080/",
+            data: {title : txt, content : 'TEST'}
+        }).done(function (data, textStatus, XHR) {
+            // Add each title to UL as a LI element
+
+            console.log(data)
+            console.log(textStatus)
+            console.log(XHR.getResponseHeader("Location"))
+            var loc = XHR.getResponseHeader("Location")
+            var lo = loc.substr(1)
+            $('#myUL').append('<li id="'+ lo+'">' + txt + '<span onclick="deleteElement(' + lo+ ')" class="close">X</span></li>')
+        });
+
+    }
+
+
+</script>
+
+</body>
